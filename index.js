@@ -88,6 +88,11 @@ const search = (searchText, msg) => {
       //msg.channel.send(data);
       let json = JSON.parse(data);
 
+      if(!json || !json.hits || !json.hits.hits) {
+        msg.channel.send("There was a problem performing the search. Please try again later.");
+        return;
+      }
+
       let koans = json.hits.hits;
       if(koans.length === 0) {
         msg.channel.send('No results.');
@@ -125,30 +130,30 @@ client.on('ready', () => console.log('Ready!'));
 client.on('message', (msg) => {
   if (msg.author.bot) return;
 
-  if (msg.content.startsWith(prefix)) {
-    let commandLine = msg.content.slice(prefix.length).trim();
+  if (!msg.content.startsWith(prefix)) return;
 
-    if(!commandLine || commandLine === "help" || commandLine === "--help" || commandLine === '-h') {
-      msg.channel.send(helpText);
-      return;
-    }
+  let commandLine = msg.content.slice(prefix.length).trim();
 
-    if(commandLine.startsWith('index')) {
-      let indexes = commandLine.slice(6).trim();
+  if(!commandLine || commandLine === "help" || commandLine === "--help" || commandLine === '-h') {
+    msg.channel.send(helpText);
+    return;
+  }
 
-      if(!indexes) {
-        showIndexes(msg);
-      } else {
-        if(indexes === 'clear') {
-          personalIndexes[msg.author.id] = undefined;
-          msg.channel.send('Cleared personal indexes for ' + msg.author.username);
-        } else {
-          setIndexes(indexes, msg);
-        }
-      }
+  if(commandLine.startsWith('index')) {
+    let indexes = commandLine.slice(6).trim();
+
+    if(!indexes) {
+      showIndexes(msg);
     } else {
-      search(commandLine, msg);
+      if(indexes === 'clear') {
+        personalIndexes[msg.author.id] = undefined;
+        msg.channel.send('Cleared personal indexes for ' + msg.author.username);
+      } else {
+        setIndexes(indexes, msg);
+      }
     }
+  } else {
+    search(commandLine, msg);
   }
 });
 
