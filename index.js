@@ -61,14 +61,14 @@ const setIndexes = (commandLine, msg) => {
   msg.channel.send("Indexes for " + msg.author.username + " set to " + indexes.toString());
 };
 
-const urlFunc = (search_text, author) => {
-  let encodedText = encodeURIComponent(search_text);
+const urlFunc = (searchText, author) => {
+  let encodedText = encodeURIComponent(searchText);
   let indexes = personalIndexes[author.id] ? personalIndexes[author.id] : Object.keys(indexTitles).join();
   return 'https://zenmarrow.com/es/' + indexes + '/_search?size=1&q=' + encodedText;
 };
 
-const zmUrl = (search_text) => {
-  let encodedText = encodeURIComponent(search_text);
+const zmUrl = (searchText) => {
+  let encodedText = encodeURIComponent(searchText);
   return 'https://zenmarrow.com/?q=' + encodedText;
 };
 
@@ -102,7 +102,7 @@ const search = (searchText, msg) => {
             caseText = caseText.slice(0, 1997) + '...';
           }
           msg.channel.send(caseText);
-          msg.channel.send("More at: " + zmUrl(search_text));
+          msg.channel.send("More at: " + zmUrl(searchText));
         }
       }
     });
