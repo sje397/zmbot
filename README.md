@@ -5,5 +5,4 @@ called `settings.json` which looks like this:
       "token": "<token goes here>"
     }
 
-See the instructions at https://github.com/nomsi/docker-discordjs-tutorial
-for step by step instructions.
+See https://github.com/nomsi/docker-discordjs-tutorial for step by step instructions.
