@@ -142,8 +142,8 @@ client.on('message', (msg) => {
     return;
   }
 
-  if(commandLine.startsWith('index ')) {
-    let indexes = commandLine.slice('index '.length).trim();
+  if(commandLine.startsWith('index')) {
+    let indexes = commandLine.slice('index'.length).trim();
 
     if(!indexes) {
       showIndexes(msg);
