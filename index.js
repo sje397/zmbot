@@ -20,6 +20,8 @@ Set personal indexes:
 Clear personal indexes:
 ` + prefix + ` index clear`;
 
+const MAX_MESSAGE_SIZE = 2000;
+
 const indexTitles = {
   bcr: "Blue Cliff Record",
   mmk: "Gateless Gate",
@@ -49,8 +51,8 @@ const setIndexes = (commandLine, msg) => {
 
   let indexes = [];
   for(var j in selected) {
-    let index = selected[j].trim();
-    if(!(index in indexTitles)) {
+    let index = selected[j].trim().toLowerCase();
+    if(!indexTitles[index]) {
       msg.channel.send("Unknown index: " + index);
       return;
     }
@@ -64,7 +66,7 @@ const setIndexes = (commandLine, msg) => {
 const urlFunc = (searchText, author) => {
   let encodedText = encodeURIComponent(searchText);
   let indexes = personalIndexes[author.id] ? personalIndexes[author.id] : Object.keys(indexTitles).join();
-  return 'https://zenmarrow.com/es/' + indexes + '/_search?size=1&q=' + encodedText;
+  return 'https://zenmarrow.com/public_es/' + indexes + '/_search?size=1&q=' + encodedText;
 };
 
 const zmUrl = (searchText) => {
@@ -103,10 +105,11 @@ const search = (searchText, msg) => {
 
           msg.channel.send(title);
           let caseText = koan._source.case;
-          if(caseText.length > 2000) {
-            caseText = caseText.slice(0, 1997) + '...';
+          while(caseText.length > 0) {
+            batch = caseText.slice(0, MAX_MESSAGE_SIZE);
+            caseText = caseText.slice(MAX_MESSAGE_SIZE);
+            msg.channel.send(batch);
           }
-          msg.channel.send(caseText);
           msg.channel.send("More at: " + zmUrl(searchText));
         }
       }
@@ -139,8 +142,8 @@ client.on('message', (msg) => {
     return;
   }
 
-  if(commandLine.startsWith('index')) {
-    let indexes = commandLine.slice(6).trim();
+  if(commandLine.startsWith('index ')) {
+    let indexes = commandLine.slice('index '.length).trim();
 
     if(!indexes) {
       showIndexes(msg);
