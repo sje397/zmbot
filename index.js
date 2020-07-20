@@ -32,7 +32,8 @@ const indexTitles = {
   foyan: "Instant Zen (Foyan)",
   dong: "The Record of Tung-shan (Dongshan)",
   yun: "Zen Master Yunmen",
-  ma: "Sun Face Buddha (Master Ma)"
+  ma: "Sun Face Buddha (Master Ma)",
+  hb: "Transmission of Mind (Huangbo)"
 };
 
 const sourceTextFromIndex = (index) => {
