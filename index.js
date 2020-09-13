@@ -33,7 +33,8 @@ const indexTitles = {
   dong: "The Record of Tung-shan (Dongshan)",
   yun: "Zen Master Yunmen",
   ma: "Sun Face Buddha (Master Ma)",
-  hb: "Transmission of Mind (Huangbo)"
+  hb: "Transmission of Mind (Huangbo)",
+  lin: "The Zen Teachings of Master Lin-Chi (Linji)"
 };
 
 const sourceTextFromIndex = (index) => {
