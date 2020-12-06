@@ -27,6 +27,7 @@ const indexTitles = {
   mmk: "Gateless Gate",
   bos: "Book of Serenity",
   sho: "Treasury of the Eye of True Teaching",
+  mt: "The Measuring Tap",
   zz: "Sayings of Joshu",
   pang: "Sayings of Layman P'ang",
   foyan: "Instant Zen (Foyan)",
