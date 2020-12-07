@@ -28,6 +28,7 @@ const indexTitles = {
   bos: "Book of Serenity",
   sho: "Treasury of the Eye of True Teaching",
   mt: "The Measuring Tap",
+  ev: "The Empty Valley Collection",
   zz: "Sayings of Joshu",
   pang: "Sayings of Layman P'ang",
   foyan: "Instant Zen (Foyan)",
