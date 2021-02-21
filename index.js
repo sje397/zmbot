@@ -18,7 +18,10 @@ Set personal indexes:
 ` + prefix + ` index sho,mmk
 
 Clear personal indexes:
-` + prefix + ` index clear`;
+` + prefix + ` index clear
+
+Random:
+` + prefix + ` rnd`;
 
 const MAX_MESSAGE_SIZE = 2000;
 
@@ -125,6 +128,53 @@ const search = (searchText, msg) => {
   });
 };
 
+const getRandom = (msg) => {
+  let url = 'https://zenmarrow.com/es/_search'
+  let seed = new Date().getTime();
+  let q = '{"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": "' + seed + '"}}]}}}';
+
+  https.get(url, q, (resp) => {
+    let data = '';
+
+    // A chunk of data has been recieved.
+    resp.on('data', (chunk) => {
+      data += chunk;
+    });
+
+    // The whole response has been received. Print out the result.
+    resp.on('end', () => {
+      //msg.channel.send(data);
+      let json = JSON.parse(data);
+
+      if(!json || !json.hits || !json.hits.hits) {
+        msg.channel.send("There was a problem performing the search. Please try again later.");
+        return;
+      }
+
+      let koans = json.hits.hits;
+      if(koans.length === 0) {
+        msg.channel.send('No results.');
+      } else {
+        for(var i in koans) {
+          let koan = koans[i];
+          let title = '**' + sourceTextFromIndex(koan._index) + ' #' + koan._id + ': ' + koan._source.name + '**';
+
+          msg.channel.send(title);
+          let caseText = koan._source.case;
+          while(caseText.length > 0) {
+            batch = caseText.slice(0, MAX_MESSAGE_SIZE);
+            caseText = caseText.slice(MAX_MESSAGE_SIZE);
+            msg.channel.send(batch);
+          }
+        }
+      }
+    });
+
+  }).on("error", (err) => {
+    msg.channel.send("Error: " + err.message);
+  });
+};
+
 const showIndexes = (msg) => {
   let text = '';
   for(j in indexTitles) {
@@ -160,6 +210,8 @@ client.on('message', (msg) => {
         setIndexes(indexes, msg);
       }
     }
+  } else if(commandLine.startsWith('rnd')) {
+    getRandom(msg);
   } else {
     search(commandLine, msg);
   }
