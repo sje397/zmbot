@@ -129,17 +129,19 @@ const search = (searchText, msg) => {
 };
 
 const getRandom = (msg) => {
+  let seed = new Date().getTime();
+  let q = '{"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": "' + seed + '"}}]}}}';
   let options = {
     hostname: 'zenmarrow.com',
     protocol: 'https:',
     port: 443,
     path: '/public_es/_search',
-    method: 'GET'
+    method: 'GET',
+    json: true,
+    body: q
   }; 
-  let seed = new Date().getTime();
-  let q = '{"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": "' + seed + '"}}]}}}';
 
-  let req = https.request(options, (resp) => {
+  let req = https.get(options, (resp) => {
     let data = '';
 
     // A chunk of data has been recieved.
@@ -179,9 +181,6 @@ const getRandom = (msg) => {
   }).on("error", (err) => {
     msg.channel.send("Error: " + err.message);
   });
-
-  req.write(q);
-  req.end();
 };
 
 const showIndexes = (msg) => {
