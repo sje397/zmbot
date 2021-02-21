@@ -133,7 +133,7 @@ const getRandom = (msg) => {
   let seed = new Date().getTime();
   let q = '{"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": "' + seed + '"}}]}}}';
 
-  https.get(url, q, (resp) => {
+  let req = https.get(url, (resp) => {
     let data = '';
 
     // A chunk of data has been recieved.
@@ -173,6 +173,9 @@ const getRandom = (msg) => {
   }).on("error", (err) => {
     msg.channel.send("Error: " + err.message);
   });
+
+  req.write(q);
+  req.end();
 };
 
 const showIndexes = (msg) => {
