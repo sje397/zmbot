@@ -130,18 +130,9 @@ const search = (searchText, msg) => {
 
 const getRandom = (msg) => {
   let seed = new Date().getTime();
-  let q = '{"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": "' + seed + '"}}]}}}';
-  let options = {
-    hostname: 'zenmarrow.com',
-    protocol: 'https:',
-    port: 443,
-    path: '/public_es/_search',
-    method: 'GET',
-    json: true,
-    body: q
-  }; 
+  let q = {"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": '' + seed }}]}}};
 
-  let req = https.get(options, (resp) => {
+  let req = https.get('https://zenmarrow.com/public_es/_search', {json: true, body: q}, (resp) => {
     let data = '';
 
     // A chunk of data has been recieved.
