@@ -129,7 +129,7 @@ const search = (searchText, msg) => {
 };
 
 const getRandom = (msg) => {
-  let url = 'https://zenmarrow.com/es/_search'
+  let url = 'https://zenmarrow.com/public_es/_search'
   let seed = new Date().getTime();
   let q = '{"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": "' + seed + '"}}]}}}';
 
