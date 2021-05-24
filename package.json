@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bent": "^7.3.12",
     "discord.js": "github:hydrabolt/discord.js",
     "optparse": "^1.0.5"
   }

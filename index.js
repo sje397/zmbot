@@ -1,8 +1,8 @@
-const { Client } = require('discord.js');
+const { Client, Intents } = require('discord.js');
 const { token } = require('./settings');
-const https = require('https');
+const bent = require('bent');
 
-const client = new Client();
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 const prefix = '!zms';
 
@@ -85,45 +85,31 @@ const zmUrl = (searchText) => {
 const search = (searchText, msg) => {
   let url = urlFunc(searchText, msg.author);
 
-  https.get(url, (resp) => {
-    let data = '';
+  bent('json')(url).then((json) => {
+    if(!json || !json.hits || !json.hits.hits) {
+      msg.channel.send("There was a problem performing the search. Please try again later.");
+      return;
+    }
 
-    // A chunk of data has been recieved.
-    resp.on('data', (chunk) => {
-      data += chunk;
-    });
+    let koans = json.hits.hits;
+    if(koans.length === 0) {
+      msg.channel.send('No results.');
+    } else {
+      for(var i in koans) {
+        let koan = koans[i];
+        let title = '**' + sourceTextFromIndex(koan._index) + ' #' + koan._id + ': ' + koan._source.name + '**';
 
-    // The whole response has been received. Print out the result.
-    resp.on('end', () => {
-      //msg.channel.send(data);
-      let json = JSON.parse(data);
-
-      if(!json || !json.hits || !json.hits.hits) {
-        msg.channel.send("There was a problem performing the search. Please try again later.");
-        return;
-      }
-
-      let koans = json.hits.hits;
-      if(koans.length === 0) {
-        msg.channel.send('No results.');
-      } else {
-        for(var i in koans) {
-          let koan = koans[i];
-          let title = '**' + sourceTextFromIndex(koan._index) + ' #' + koan._id + ': ' + koan._source.name + '**';
-
-          msg.channel.send(title);
-          let caseText = koan._source.case;
-          while(caseText.length > 0) {
-            batch = caseText.slice(0, MAX_MESSAGE_SIZE);
-            caseText = caseText.slice(MAX_MESSAGE_SIZE);
-            msg.channel.send(batch);
-          }
-          msg.channel.send("More at: " + zmUrl(searchText));
+        msg.channel.send(title);
+        let caseText = koan._source.case;
+        while(caseText.length > 0) {
+          batch = caseText.slice(0, MAX_MESSAGE_SIZE);
+          caseText = caseText.slice(MAX_MESSAGE_SIZE);
+          msg.channel.send(batch);
         }
+        msg.channel.send("More at: " + zmUrl(searchText));
       }
-    });
-
-  }).on("error", (err) => {
+    }
+  }).catch((err) => {
     msg.channel.send("Error: " + err.message);
   });
 };
@@ -132,44 +118,30 @@ const getRandom = (msg) => {
   let seed = new Date().getTime();
   let q = {"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": '' + seed }}]}}};
 
-  let req = https.get('https://zenmarrow.com/public_es/_search', {json: true, body: q}, (resp) => {
-    let data = '';
+  bent('json')('https://zenmarrow.com/public_es/_search', q).then(json => {
+    if(!json || !json.hits || !json.hits.hits) {
+      msg.channel.send("There was a problem performing the search. Please try again later.");
+      return;
+    }
 
-    // A chunk of data has been recieved.
-    resp.on('data', (chunk) => {
-      data += chunk;
-    });
+    let koans = json.hits.hits;
+    if(koans.length === 0) {
+      msg.channel.send('No results.');
+    } else {
+      for(var i in koans) {
+        let koan = koans[i];
+        let title = '**' + sourceTextFromIndex(koan._index) + ' #' + koan._id + ': ' + koan._source.name + '**';
 
-    // The whole response has been received. Print out the result.
-    resp.on('end', () => {
-      //msg.channel.send(data);
-      let json = JSON.parse(data);
-
-      if(!json || !json.hits || !json.hits.hits) {
-        msg.channel.send("There was a problem performing the search. Please try again later.");
-        return;
-      }
-
-      let koans = json.hits.hits;
-      if(koans.length === 0) {
-        msg.channel.send('No results.');
-      } else {
-        for(var i in koans) {
-          let koan = koans[i];
-          let title = '**' + sourceTextFromIndex(koan._index) + ' #' + koan._id + ': ' + koan._source.name + '**';
-
-          msg.channel.send(title);
-          let caseText = koan._source.case;
-          while(caseText.length > 0) {
-            batch = caseText.slice(0, MAX_MESSAGE_SIZE);
-            caseText = caseText.slice(MAX_MESSAGE_SIZE);
-            msg.channel.send(batch);
-          }
+        msg.channel.send(title);
+        let caseText = koan._source.case;
+        while(caseText.length > 0) {
+          batch = caseText.slice(0, MAX_MESSAGE_SIZE);
+          caseText = caseText.slice(MAX_MESSAGE_SIZE);
+          msg.channel.send(batch);
         }
       }
-    });
-
-  }).on("error", (err) => {
+    }
+  }).catch(err => {
     msg.channel.send("Error: " + err.message);
   });
 };
